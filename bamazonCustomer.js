@@ -74,7 +74,7 @@ function startBuy() {
                 connection.query("SELECT * FROM products", function(err, res) {
                     if (err) throw err;
                     // Log all results of the SELECT statement
-                    console.log(res[idIndex].stock_quantity);
+                    // console.log(res[idIndex].stock_quantity);
                     var price = parseInt(res[idIndex].price);
                     var item = res[idIndex].product_name;
                     newStock = res[idIndex].stock_quantity - value.item_quantity; //setting the new inventory
@@ -89,6 +89,7 @@ function startBuy() {
                         shoppingCart.push(id);
                         // console.log(shoppingCart);
                         // console.log(shoppingCart[0].id)
+                        console.log("--------------------");
                         console.log(item + " added to Shopping Cart");
                         updateInventory(); //once items are added to shopping cart, update the inventory
                     } else {
@@ -122,6 +123,8 @@ function updateInventory() {
                     total = total + (shoppingCart[i].price * shoppingCart[i].quantity);
                 }
                 console.log("Your current total: $" + total);
+                console.log("--------------------");
+                console.log("");
                 shoppingCart = [];
                 checkOut();
             }
@@ -140,8 +143,8 @@ function checkOut(){
     		startBuy();
     	}
     	else{
-    		console.log("Thank you for shopping with us!");
     		console.log("Your final total comes out to $"+ total);
+    		console.log("Thank you for shopping with us!");
     		connection.end();
     		
     	
