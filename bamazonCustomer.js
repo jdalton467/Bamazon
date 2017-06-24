@@ -103,11 +103,12 @@ function start() {
                                     shoppingCart.push(id);
                                     // console.log(shoppingCart);
                                     // console.log(shoppingCart[0].id)
-                                    console.log("--------------------");
-                                    console.log(item + " added to Shopping Cart");
+                                    console.log("--------------------------------------------------");
+                                    console.log("| " + value.item_quantity + " " + item + " added to your Shopping Cart");
                                     updateInventory(); //once items are added to shopping cart, update the inventory
                                 } else {
-                                    console("insufficient quantity");
+                                    console.log("insufficient quantity");
+                                    startBuy();
                                 }
                             });
 
@@ -136,8 +137,8 @@ function start() {
                             for (i = 0; i < shoppingCart.length; i++) {
                                 total = total + (shoppingCart[i].price * shoppingCart[i].quantity);
                             }
-                            console.log("Your current total: $" + total);
-                            console.log("--------------------");
+                            console.log("| Your current total: $" + total);    
+                            console.log("--------------------------------------------------");
                             console.log("");
                             shoppingCart = [];
                             checkOut();
@@ -156,7 +157,7 @@ function start() {
                     if (value.type == "YES") {
                         startBuy();
                     } else {
-                        console.log("Your final total comes out to $" + total);
+                        console.log("Final Total: $" + total);
                         console.log("Thank you for shopping with us!");
                         connection.end();
 
