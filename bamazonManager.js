@@ -158,6 +158,10 @@ function addInventory() {
                     type: "input",
                     message: "Enter the ID of the product you would like to replenish : "
                 }]).then(function(value) {
+                				if(replenishList = []){
+                					console.log("EVERYTHING STOCKED"); // if everything is stocked then the user will be redirected to the menu screen
+                					listOption();
+                				}
                         replenish_id = value.replenish_ID;//use for later when updating the table
                         // console.log(replenish_id)
                         for (var i = 0 in replenishList) {
