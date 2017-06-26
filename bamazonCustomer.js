@@ -13,6 +13,7 @@
 
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+productsStock = [];
 var shoppingCart = []; // will hold an array of objects 
 // create the connection information for the sql database
 var newStock;
@@ -49,6 +50,7 @@ function start() {
                     console.log("Price: $" + res[i].price);
                     console.log("**********");
                     console.log("");
+                    productsStock.push(res[i].item_id);
                 }
 
                 inquirer.prompt([{
@@ -79,7 +81,7 @@ function start() {
                 }]).then(function(value) {
                     var idIndex = (parseInt(value.item_id) - 1); // used to grab the stockquantity
                     var id = value.item_id // used later for the shoppingCart object
-                    if (isNaN(parseInt(value.item_id)) === false && parseInt(value.item_id) >= 1 && parseInt(value.item_id) <= 10) {
+                    if (isNaN(parseInt(value.item_id)) === false && parseInt(value.item_id) >= 1 && parseInt(value.item_id) <= parseInt(productsStock.length + 1)) {
                         inquirer.prompt([{
                             name: "item_quantity",
                             type: "input",

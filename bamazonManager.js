@@ -7,12 +7,18 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var fs = require("fs");
+var idList = [];
 var replenishList = []; //array holding items that need to be replenished
 // var managerAuth;
 var replenishListStock = [];
 var currentStock = 0;
 var replenish_amount = 0;
 var replenish_id = 0;
+var insertID = 0;
+var insertItem;
+var insertDepartment;
+var insertPrice = 0;
+var insertQuantity = 0;
 
 
 var connection = mysql.createConnection({
@@ -57,17 +63,22 @@ function listOption() {
     inquirer.prompt([{
         "type": "list",
         "name": "type",
-        "choices": ["View Products for Sale", "View Low Inventory", "Add New Product"], //if user selected then you will be able to study the cards, if admin is selected then you can create cards
+        "choices": ["View Products for Sale", "View Low Inventory", "Add New Product", "Exit"], //if user selected then you will be able to study the cards, if admin is selected then you can create cards
         "message": "What would you like to do?"
     }]).then(function(value) {
         switch (value.type) {
             case "View Products for Sale":
                 viewProducts();
                 break;
-            case "View Low Inventory":
+            case "View Low Inventory": //addInventory is nested here
                 viewInventory();
                 break;
-
+            case "Add New Product":
+                addProduct();
+                break;
+            case "Exit":
+                exit();
+                break;
         }
     })
 }
@@ -86,6 +97,7 @@ function viewProducts() {
             console.log("Quantity in Stock: " + res[i].stock_quantity);
             console.log("**********");
             console.log("");
+            idList.push(res[i].item_id);
         }
         inquirer.prompt([{
             "type": "list",
@@ -121,10 +133,11 @@ function viewInventory() {
             "type": "list",
             "name": "type",
             "choices": ["YES", "NO"], //if user selected then you will be able to study the cards, if admin is selected then you can create cards
-            "message": "Replenish Items? (This is Recommended)"
+            "message": "Replenish Items? (This is Recommended) warning: if no items are present, press 'NO' "
         }]).then(function(value) {
             if (value.type == "YES") {
                 addInventory();
+
             } else {
                 listOption();
             }
@@ -136,73 +149,142 @@ function viewInventory() {
 
 function addInventory() {
     connection.query("SELECT * FROM products", function(err, res) {
-                if (err) throw err;
-                console.log("");
-                console.log("ITEMS IN LOW SUPPLY")
-                console.log("*********************")
-                for (i = 0; i < res.length; i++) {
-                    if (res[i].stock_quantity < 5) {
+        if (err) throw err;
+        console.log("");
+        console.log("ITEMS IN LOW SUPPLY")
+        console.log("*********************")
+        for (i = 0; i < res.length; i++) {
+            if (res[i].stock_quantity < 5) {
 
-                        replenishList.push(res[i].item_id);
-                        replenishListStock.push(res[i].stock_quantity);
-                        // console.log(replenishListStock);
-                    }
-                }
-                console.log(replenishListStock);
-                console.log(replenishList);
-                console.log("*********************");
-                console.log("");
+                replenishList.push(res[i].item_id);
+                replenishListStock.push(res[i].stock_quantity);
+                // console.log(replenishListStock);
+            }
+        }
+        console.log(replenishListStock);
+        console.log(replenishList);
+        console.log("*********************");
+        console.log("");
 
-                inquirer.prompt([{
-                    name: "replenish_ID",
-                    type: "input",
-                    message: "Enter the ID of the product you would like to replenish : "
-                }]).then(function(value) {
-                				if(replenishList = []){
-                					console.log("EVERYTHING STOCKED"); // if everything is stocked then the user will be redirected to the menu screen
-                					listOption();
-                				}
-                        replenish_id = value.replenish_ID;//use for later when updating the table
-                        // console.log(replenish_id)
-                        for (var i = 0 in replenishList) {
-                            if (value.replenish_ID == replenishList[i]) {
-                                inquirer.prompt([{
-                                        name: "replenish_quantity",
-                                        type: "input",
-                                        message: "Enter the enter the number of units to add to item stock: "
-                                    }]).then(function(value) {
-                                    				 // for(var i = 0 in replenishListStock){
-                                    				currentStock = parseInt(replenishListStock[replenishList.indexOf(parseInt(replenish_id))]);
-                                    			  
-                                    			
-                                            replenish_amount = parseInt(value.replenish_quantity) + currentStock;
-                                            connection.query("UPDATE products SET? WHERE?", [
-                                            				{
-                                                        stock_quantity: replenish_amount
-                                                    }, 
-                                                    {
-                                                        item_id: replenish_id
-                                                    }
-
-                                                ],function(err,res){
-                                                	if(err) throw err;
-                                                	listOption();
-                                                }
-                                            );
-                                    });
-                                    // listOption();
+        inquirer.prompt([{
+            name: "replenish_ID",
+            type: "input",
+            message: "Enter the ID of the product you would like to replenish : "
+        }]).then(function(value) {
+            if (replenishList == []) {
+                console.log("EVERYTHING STOCKED"); // if everything is stocked then the user will be redirected to the menu screen
+                listOption();
+            }
+            replenish_id = value.replenish_ID; //use for later when updating the table
+            // console.log(replenish_id)
+            for (var i = 0 in replenishList) {
+                if (value.replenish_ID == replenishList[i]) {
+                    inquirer.prompt([{
+                        name: "replenish_quantity",
+                        type: "input",
+                        message: "Enter the enter the number of units to add to item stock: "
+                    }]).then(function(value) {
+                        // for(var i = 0 in replenishListStock){
+                        currentStock = parseInt(replenishListStock[replenishList.indexOf(parseInt(replenish_id))]);
 
 
-
-
+                        replenish_amount = parseInt(value.replenish_quantity) + currentStock;
+                        connection.query("UPDATE products SET? WHERE?", [{
+                                stock_quantity: replenish_amount
+                            }, {
+                                item_id: replenish_id
                             }
-                        }
-                });
 
+                        ], function(err, res) {
+                            if (err) throw err;
+                            listOption();
+                        });
+                        replenishList = [];
+                        replenishListStock = [];
+                    });
+                    // listOption();
+
+
+
+
+                }
+            }
         });
 
-  }
-        //it in order to update the inventory, first provide a list of the items in low supply
-        //then inquire the user to enter the id of the product that needs replenishing,
-        //then inquire the user to enter the amount to replenish by and store that in a variable called replenish
-        //update from products where?
+    });
+
+}
+
+
+function addProduct() {
+    console.log("Inserting a new product...\n");
+        inquirer.prompt([{
+            name: "insertItem",
+            type: "input",
+            message: "Enter the new product name: "
+        }]).then(function(value) {
+            insertItem = value.insertItem;
+            inquirer.prompt([{
+                name: "insertDepartment",
+                type: "input",
+                message: "Enter the new department: "
+            }]).then(function(value) {
+                insertDepartment = value.insertDepartment;
+                inquirer.prompt([{
+                    name: "insertPrice",
+                    type: "input",
+                    message: "Enter the new price: "
+                }]).then(function(value) {
+                    insertPrice = value.insertPrice;
+                    inquirer.prompt([{
+                        name: "insertQuantity",
+                        type: "input",
+                        message: "Enter the new quantity: "
+                    }]).then(function(value) {
+                        insertQuantity = value.insertQuantity;
+                        connection.query(
+                            "INSERT INTO products SET ?", {
+                                item_id: parseInt(insertID),
+                                product_name: insertItem,
+                                department_name: insertDepartment,
+                                price: parseFloat(insertPrice),
+                                stock_quantity: parseInt(insertQuantity),
+                            },
+                            function(err, res) {
+                                var insertID = 0;
+                                var insertItem;
+                                var insertDepartment;
+                                var insertPrice = 0;
+                                var insertQuantity = 0;
+
+                                listOption();
+                                // console.log(res.affectedRows + " product inserted!\n");
+                                // Call updateCrud AFTER the INSERT completes
+                                // updateCr/ud();
+                            }
+                        );
+
+
+
+
+                    })
+                })
+            })
+        })
+    
+
+    // 
+}
+
+
+
+
+
+
+function exit() {
+    connection.end();
+}
+//it in order to update the inventory, first provide a list of the items in low supply
+//then inquire the user to enter the id of the product that needs replenishing,
+//then inquire the user to enter the amount to replenish by and store that in a variable called replenish
+//update from products where?
