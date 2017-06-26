@@ -256,7 +256,7 @@ function addProduct() {
                                 var insertDepartment;
                                 var insertPrice = 0;
                                 var insertQuantity = 0;
-
+                                console.log("NEW PRODUCT ADDED");
                                 listOption();
                                 // console.log(res.affectedRows + " product inserted!\n");
                                 // Call updateCrud AFTER the INSERT completes
