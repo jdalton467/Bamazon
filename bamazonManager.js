@@ -70,13 +70,13 @@ function listOption() {
             case "View Products for Sale":
                 viewProducts();
                 break;
-            case "View Low Inventory": //addInventory is nested here
+            case "View Low Inventory": //addInventory is nested here, this option will show if there are any items that are less than 5
                 viewInventory();
                 break;
-            case "Add New Product":
+            case "Add New Product": //lets you add new product to the database
                 addProduct();
                 break;
-            case "Exit":
+            case "Exit": //lets you exit the program by terminating the connection
                 exit();
                 break;
         }
@@ -115,7 +115,7 @@ function viewInventory() {
     connection.query("SELECT * FROM products", function(err, res) {
         if (err) throw err;
         console.log("");
-        console.log("ITEMS IN LOW SUPPLY")
+        console.log("ITEMS IN LOW SUPPLY") //prints out items that have a count of less than 5
         console.log("*********************")
         for (i = 0; i < res.length; i++) {
             if (res[i].stock_quantity < 5) {
@@ -133,7 +133,7 @@ function viewInventory() {
             "type": "list",
             "name": "type",
             "choices": ["YES", "NO"], //if user selected then you will be able to study the cards, if admin is selected then you can create cards
-            "message": "Replenish Items? (This is Recommended) warning: if no items are present, press 'NO' "
+            "message": "Replenish Items? (This is Recommended) warning: if no items are present, press 'NO' " //if items in low supply is empty, you MUST press NO, this is bug that I am still working on, the rest of the program works
         }]).then(function(value) {
             if (value.type == "YES") {
                 addInventory();
@@ -167,7 +167,7 @@ function addInventory() {
         console.log("");
 
         inquirer.prompt([{
-            name: "replenish_ID",
+            name: "replenish_ID", //enter the id of the item that you want to replenish
             type: "input",
             message: "Enter the ID of the product you would like to replenish : "
         }]).then(function(value) {
@@ -199,7 +199,7 @@ function addInventory() {
                             if (err) throw err;
                             listOption();
                         });
-                        replenishList = [];
+                        replenishList = []; //clear both of these arrays
                         replenishListStock = [];
                     });
                     // listOption();
@@ -217,9 +217,9 @@ function addInventory() {
 
 
 function addProduct() {
-    console.log("Inserting a new product...\n");
+    console.log("Inserting a new product...\n"); //add products
         inquirer.prompt([{
-            name: "insertItem",
+            name: "insertItem", //since id is set to autoincrement there is no need to enter in a new id
             type: "input",
             message: "Enter the new product name: "
         }]).then(function(value) {
