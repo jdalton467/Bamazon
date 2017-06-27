@@ -3,7 +3,6 @@
 //View low inventory: list all items with an inventory count lower than five
 //Add to inventory display a prompt that will let manager add more of any item in the store
 //add a new product allow the manager to add a new product to the store
-
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var fs = require("fs");
@@ -155,14 +154,20 @@ function addInventory() {
         console.log("*********************")
         for (i = 0; i < res.length; i++) {
             if (res[i].stock_quantity < 5) {
+                console.log("");
+                console.log("----------------------------");
+                console.log(res[i].product_name + " " + "in-stock:" + " " + res[i].stock_quantity);
+                console.log(res[i].product_name + " " + "ID: " + res[i].item_id);
+                console.log("----------------------------");
+                console.log("");
 
                 replenishList.push(res[i].item_id);
                 replenishListStock.push(res[i].stock_quantity);
                 // console.log(replenishListStock);
             }
         }
-        console.log(replenishListStock);
-        console.log(replenishList);
+        // console.log(replenishListStock);
+        // console.log(replenishList);
         console.log("*********************");
         console.log("");
 
@@ -218,65 +223,63 @@ function addInventory() {
 
 function addProduct() {
     console.log("Inserting a new product...\n"); //add products
+    inquirer.prompt([{
+        name: "insertItem", //since id is set to autoincrement there is no need to enter in a new id
+        type: "input",
+        message: "Enter the new product name: "
+    }]).then(function(value) {
+        insertItem = value.insertItem;
         inquirer.prompt([{
-            name: "insertItem", //since id is set to autoincrement there is no need to enter in a new id
+            name: "insertDepartment",
             type: "input",
-            message: "Enter the new product name: "
+            message: "Enter the new department: "
         }]).then(function(value) {
-            insertItem = value.insertItem;
+            insertDepartment = value.insertDepartment;
             inquirer.prompt([{
-                name: "insertDepartment",
+                name: "insertPrice",
                 type: "input",
-                message: "Enter the new department: "
+                message: "Enter the new price: "
             }]).then(function(value) {
-                insertDepartment = value.insertDepartment;
+                insertPrice = value.insertPrice;
                 inquirer.prompt([{
-                    name: "insertPrice",
+                    name: "insertQuantity",
                     type: "input",
-                    message: "Enter the new price: "
+                    message: "Enter the new quantity: "
                 }]).then(function(value) {
-                    insertPrice = value.insertPrice;
-                    inquirer.prompt([{
-                        name: "insertQuantity",
-                        type: "input",
-                        message: "Enter the new quantity: "
-                    }]).then(function(value) {
-                        insertQuantity = value.insertQuantity;
-                        connection.query(
-                            "INSERT INTO products SET ?", {
-                                item_id: parseInt(insertID),
-                                product_name: insertItem,
-                                department_name: insertDepartment,
-                                price: parseFloat(insertPrice),
-                                stock_quantity: parseInt(insertQuantity),
-                            },
-                            function(err, res) {
-                                var insertID = 0;
-                                var insertItem;
-                                var insertDepartment;
-                                var insertPrice = 0;
-                                var insertQuantity = 0;
-                                console.log("NEW PRODUCT ADDED");
-                                listOption();
-                                // console.log(res.affectedRows + " product inserted!\n");
-                                // Call updateCrud AFTER the INSERT completes
-                                // updateCr/ud();
-                            }
-                        );
+                    insertQuantity = value.insertQuantity;
+                    connection.query(
+                        "INSERT INTO products SET ?", {
+                            item_id: parseInt(insertID),
+                            product_name: insertItem,
+                            department_name: insertDepartment,
+                            price: parseFloat(insertPrice),
+                            stock_quantity: parseInt(insertQuantity),
+                        },
+                        function(err, res) {
+                            var insertID = 0;
+                            var insertItem;
+                            var insertDepartment;
+                            var insertPrice = 0;
+                            var insertQuantity = 0;
+                            console.log("NEW PRODUCT ADDED");
+                            listOption();
+                            // console.log(res.affectedRows + " product inserted!\n");
+                            // Call updateCrud AFTER the INSERT completes
+                            // updateCr/ud();
+                        }
+                    );
 
 
 
 
-                    })
                 })
             })
         })
-    
+    })
+
 
     // 
 }
-
-
 
 
 
