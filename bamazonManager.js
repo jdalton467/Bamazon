@@ -176,7 +176,7 @@ function addInventory() {
             type: "input",
             message: "Enter the ID of the product you would like to replenish : "
         }]).then(function(value) {
-            if (replenishList == []) {
+            if (replenishList.length == 0) {
                 console.log("EVERYTHING STOCKED"); // if everything is stocked then the user will be redirected to the menu screen
                 listOption();
             }
